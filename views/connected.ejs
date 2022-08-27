@@ -1,0 +1,69 @@
+<html>
+<head>
+  <title>OAuth2 Sample App - Intuit</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script>
+    if(window.opener) {
+      window.opener.location.href = '/connected'
+      window.close()
+    }
+
+    function apiCall() {
+      $("#result").html('Loading...')
+      $.get("/api_call/companyinfo", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function updateVendors() {
+      $("#result").html('Loading...')
+      $.get("/api_call/update_vendors", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function updateAccounts() {
+      $("#result").html('Loading...')
+      $.get("/api_call/update_accounts", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function revokeCall() {
+      $("#result").html('Loading...')
+      $.get("/api_call/revoke", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+    function refreshCall() {
+      $("#result").html('Loading...')
+      $.get("/api_call/refresh", function(data) {
+        $("#result").html(JSON.stringify(data, null, 2))
+      })
+    }
+  </script>
+</head>
+<body>
+  <a href="/">Home</a>
+  <h3>Connected!</h3>
+  <p>Welcome<% if (locals.givenName) { %>, <%= locals.givenName %><% } %>!</p>
+  <p>Would you like to make a sample API call?</p>
+  <div>
+    <button onclick="apiCall()">QuickBooks API Call</button>
+    <button onclick="updateVendors()">Push Vendors</button>
+    <button onclick="updateAccounts()">Push Accounts</button>
+    <button onclick="refreshCall()">Refresh Token Call</button>
+    <button onclick="revokeCall()">Revoke Token Call</button>
+    <div class="container">
+      <h1>File Upload</h1>
+      <form id='form'>
+          <div class="input-group">
+              <label for='files'>Select file:</label>
+              <input id='files' type="file" multiple>
+          </div>
+          <button class="submit-btn" type='submit'>Upload</button>
+      </form>
+  </div>
+  <script src='./script.js'></script><s></s>
+    <br><br>
+    <div><code id="result"></code></div>
+</body>
+</html>
