@@ -1,13 +1,15 @@
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
+const fs = require("fs");
 
-var tools = require("../tools/tools.js");
+var no = require("../tools/tools.js");
 var config = require("../config.json");
 var request = require("request");
 var express = require("express");
 var router = express.Router();
 
 const xlsxFile = require("read-excel-file/node");
+const { json } = require("express");
 
 router.post("/", upload.array("files"), (req, res) => {
   //console.log(req.body);
@@ -19,7 +21,16 @@ router.post("/", upload.array("files"), (req, res) => {
       });
     });
   });
-  return res.json({ message: "Successfully uploaded files" });
-}); //upload.array("files"),
+
+  /*await fs.unlink(req.files[0].path, (err) => {
+    if (err) {
+      console.error(err);
+    }
+  });*/
+
+  const jsonResponse = { message: "Successfully uploaded files" };
+  console.log(jsonResponse);
+  return res.json(jsonResponse);
+});
 
 module.exports = router;

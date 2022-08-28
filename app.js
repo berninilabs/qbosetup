@@ -17,9 +17,6 @@ app.get("/", function (req, res) {
   res.render("home", config);
 });
 
-// Sign In With Intuit, Connect To QuickBooks, or Get App Now
-// These calls will redirect to Intuit's authorization flow
-app.use("/sign_in_with_intuit", require("./routes/sign_in_with_intuit.js"));
 app.use("/connect_to_quickbooks", require("./routes/connect_to_quickbooks.js"));
 
 // Callback - called via redirect_uri after authorization

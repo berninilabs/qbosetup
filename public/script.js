@@ -12,11 +12,9 @@ function submitForm(e) {
   }
   fetch("/upload_files", {
     method: "POST",
-    body: formData, //,
-    //headers: {
-    //  "Content-Type": "multipart/form-data",
-    //},
+    body: formData,
   })
-    .then((res) => console.log(res))
+    .then((data) => $("#result").html(JSON.stringify(data, null, 2)))
+    //.then((res) => console.log(res))
     .catch((err) => ("Error occured", err));
 }
