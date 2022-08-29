@@ -15,10 +15,10 @@ const { json } = require("express");
 router.post("/", upload.array("files"), (req, res) => {
   //console.log(req.body);
   console.log(req.files);
-  var successCount = update_vendors_new(
-    req,
-    res,
-    xlsxFile(req.files[0].path, { sheet: "Vendor List" })
+  var successCount = xlsxFile(req.files[0].path, { sheet: "Vendor List" }).then(
+    (rows) => {
+      update_vendors_new(req, res, rows);
+    }
   );
 
   const jsonResponse = {
@@ -33,7 +33,8 @@ router.post("/", upload.array("files"), (req, res) => {
       console.error(err);
     }
   });*/
-function update_vendors_new(req, res, xlsxFile) {
+function update_vendors_new(req, res, rows) {
+  console.log(`Inside update_vendors_new with ${rows.length} rows`);
   var token = tools.getToken(req.session);
   if (!token) return res.json({ error: "Not authorized" });
   if (!req.session.realmId)
@@ -42,55 +43,72 @@ function update_vendors_new(req, res, xlsxFile) {
         "No realm ID.  QBO calls only work if the accounting scope was passed!",
     });
 
-  // Set up API call (with OAuth2 accessToken)
-  var successCount = 0;
   var url = config.api_uri + req.session.realmId + "/vendor";
-  xlsxFile.then((rows) => {
-    rows.forEach((col) => {
-      col.forEach((data) => {
-        var requestObj = {
-          url: url,
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + token.accessToken,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            DisplayName: data,
-          }),
-        };
-        console.log(
-          "Making API call to: " + url + " with body: " + requestObj.body
-        );
-        // Make API call
-        request(requestObj, function (err, response) {
-          // Check if 401 response was returned - refresh tokens if so!
-          tools.checkForUnauthorized(req, requestObj, err, response).then(
-            function ({ err, response }) {
-              if (err || response.statusCode != 200) {
-                console.log(response.body);
-                return res.json({
-                  error: err,
-                  statusCode: response.statusCode,
-                });
-              }
+  var vendors = [];
 
-              // API Call was a success!
-              const responseBody = JSON.parse(response.body);
-              console.log(responseBody);
-              successCount += 1;
-              //res.json(responseBody);
-            },
-            function (err) {
-              console.log(err);
-            }
-          );
-        });
-      });
+  rows.forEach((col) => {
+    col.forEach((data) => {
+      vendors.push(data);
     });
   });
+
+  const successCount = make_api_call(req, res, url, token, vendors.shift()); //remove the first
   return successCount;
 }
 
+function make_api_call(req, res, url, token, vendors) {
+  console.log(
+    `Inside make_api_call with vendors ${
+      vendors.length
+    } to url ${url} with first vendor ${vendors[0]} and last vendor ${
+      vendors[vendors.length - 1]
+    }`
+  );
+  var successCount = 0;
+  for (vidx in vendors) {
+    var requestObj = {
+      url: url,
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token.accessToken,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        DisplayName: vendors[vidx],
+      }),
+    };
+    console.log(
+      "Making API call to: " + url + " with body: " + requestObj.body
+    );
+    // Make API call
+    request(requestObj, function (err, response) {
+      // Check if 401 response was returned - refresh tokens if so!
+      tools.checkForUnauthorized(req, requestObj, err, response).then(
+        function ({ err, response }) {
+          if (err || response.statusCode != 200) {
+            //console.log(response.body);
+            console.log(
+              `Error in adding vendor: ${vendors[vidx]}. Got response: ${response.body} with error ${err}`
+            );
+            /*return res.json({
+              error: err,
+              statusCode: response.statusCode,
+            });*/
+          } else {
+            // API Call was a success!
+            //const responseBody = JSON.parse(response.body);
+            console.log(`Successfully added vendor: ${vendors[vidx]}`);
+            successCount += 1;
+            //res.json(responseBody);
+          }
+        },
+        function (err) {
+          console.log(`Unable to add vendor: ${vendors[vidx]}`, err);
+        }
+      );
+    });
+  }
+  return successCount;
+}
 module.exports = router;
