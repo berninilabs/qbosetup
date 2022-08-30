@@ -17,7 +17,117 @@
       window.opener.location.href = '/connected'
       window.close()
     } 
-    //$("#data-table").style.display = "none";
+
+    $(document).ready(function(){
+
+// DataTable
+var userDataTable = $('#userTable').DataTable({
+   'processing': true,
+   'serverSide': true,
+   'serverMethod': 'get',
+   'ajax': {
+      'url':'user_api_call/users'
+   },
+   'columns': [
+      { data: 'name' },
+      { data: 'email' },
+      { data: 'action' },
+   ]
+});
+
+// Update record
+$('#userTable').on('click','.updateUser',function(){
+   var id = $(this).data('id');
+
+   $('#txt_userid').val(id);
+
+   // AJAX request
+   $.ajax({
+      url: 'user_api_call/users',
+      type: 'post',
+      data: {request: 2, id: id},
+      dataType: 'json',
+      success: function(response){
+         if(response.status == 1){
+
+           $('#name').val(response.data.name);
+           $('#email').val(response.data.email);
+
+           userDataTable.ajax.reload();
+         }else{
+           alert("Invalid ID.");
+         }
+      }
+   });
+
+});
+
+// Save user 
+$('#btn_save').click(function(){
+   var id = $('#txt_userid').val();
+
+   var name = $('#name').val().trim();
+   var email = $('#email').val().trim();
+
+   if(name !='' && email != ''){
+
+     // AJAX request
+     $.ajax({
+       url: 'user_api_call/users',
+       type: 'post',
+       data: {request: 3, id: id,name: name, email: email},
+       dataType: 'json',
+       success: function(response){
+          if(response.status == 1){
+             alert(response.message);
+
+             // Empty and reset the values
+             $('#name','#email').val('');
+             $('#txt_userid').val(0);
+
+             // Reload DataTable
+             userDataTable.ajax.reload();
+
+             // Close modal
+             $('#updateModal').modal('toggle');
+          }else{
+             alert(response.message);
+          }
+       }
+    });
+
+  }else{
+     alert('Please fill all fields.');
+  }
+});
+
+// Delete record
+$('#userTable').on('click','.deleteUser',function(){
+   var id = $(this).data('id');
+
+   var deleteConfirm = confirm("Are you sure?");
+   if (deleteConfirm == true) {
+      // AJAX request
+      $.ajax({
+        url: 'user_api_call/users',
+        type: 'post',
+        data: {request: 4, id: id},
+        success: function(response){
+           if(response == 1){
+              alert("Record deleted.");
+
+              // Reload DataTable
+              userDataTable.ajax.reload();
+           }else{
+              alert("Invalid ID.");
+           }
+        }
+      });
+   } 
+
+});
+});
+
     function apiCall() {
       $("#result").html('Loading...')
       $.get("/api_call/companyinfo", function(data) {
@@ -67,13 +177,48 @@
           <button class="submit-btn" type='submit'>Upload</button>
       </form>
   </div>
+  <!-- Modal -->
+  <div id="updateModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Update</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button> 
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name" >Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Enter name" required> 
+          </div> 
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" id="txt_userid" value="0">
+          <button type="button" class="btn btn-success btn-sm" id="btn_save">Save</button>
+          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
   <table id="data-table" class="table table-bordered">  
     <thead>  
          <tr>  
               <th>Display Name</th> 
          </tr>  
     </thead>  
-</table>  
+  </table>
+  <!-- Table -->
+  <table id='userTable' class='display dataTable' width='100%'>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+  </table> 
   <script src='./script.js'></script><s></s>
     <br><br>
     <div><code id="result"></code></div> 

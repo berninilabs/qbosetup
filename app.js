@@ -28,6 +28,8 @@ app.use("/connected", require("./routes/connected.js"));
 // Call an example API over OAuth2
 app.use("/api_call", require("./routes/api_call.js"));
 
+app.use("/user_api_call", require("./routes/user_api_call.js"));
+
 app.use("/upload_files", require("./routes/upload_files.js"));
 
 // Start server on HTTP (will use ngrok for HTTPS forwarding)
