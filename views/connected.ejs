@@ -3,12 +3,21 @@
   <title>OAuth2 Sample App - Intuit</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
   <script>
     if(window.opener) {
       window.opener.location.href = '/connected'
       window.close()
     }
-
+    $(document).ready(function(){  
+      $('#data-table').DataTable({  
+           "ajax"     : {"url": "/api_call/vendor", dataSrc:"QueryResponse.Vendor"},  
+           "columns"     :     [  
+                {     "data"     :     "DisplayName"     }
+ 
+           ]  
+      });  
+ });  
     function apiCall() {
       $("#result").html('Loading...')
       $.get("/api_call/companyinfo", function(data) {
@@ -48,6 +57,7 @@
   <p>Would you like to make a sample API call?</p>
   <div>
     <button onclick="apiCall()">QuickBooks API Call</button>
+    <!--button onclick="viewVendors()">View Vendors</button-->
     <button onclick="updateVendors()">Push Vendors</button>
     <button onclick="updateAccounts()">Push Accounts</button>
     <button onclick="refreshCall()">Refresh Token Call</button>
@@ -62,8 +72,15 @@
           <button class="submit-btn" type='submit'>Upload</button>
       </form>
   </div>
+  <table id="data-table" class="table table-bordered">  
+    <thead>  
+         <tr>  
+              <th>Display Name</th> 
+         </tr>  
+    </thead>  
+</table>  
   <script src='./script.js'></script><s></s>
     <br><br>
-    <div><code id="result"></code></div>
+    <div><code id="result"></code></div> 
 </body>
 </html>
