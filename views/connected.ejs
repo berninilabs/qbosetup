@@ -8,33 +8,22 @@
     if(window.opener) {
       window.opener.location.href = '/connected'
       window.close()
-    }
-    $(document).ready(function(){  
-      $('#data-table').DataTable({  
-           "ajax"     : {"url": "/api_call/vendor", dataSrc:"QueryResponse.Vendor"},  
-           "columns"     :     [  
-                {     "data"     :     "DisplayName"     }
- 
-           ]  
-      });  
- });  
+    } 
+    //$("#data-table").style.display = "none";
     function apiCall() {
       $("#result").html('Loading...')
       $.get("/api_call/companyinfo", function(data) {
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
-    function updateVendors() {
-      $("#result").html('Loading...')
-      $.get("/api_call/update_vendors", function(data) {
-        $("#result").html(JSON.stringify(data, null, 2))
-      })
-    }
-    function updateAccounts() {
-      $("#result").html('Loading...')
-      $.get("/api_call/update_accounts", function(data) {
-        $("#result").html(JSON.stringify(data, null, 2))
-      })
+    function viewVendors() {
+      //$("#data-table").style.display = "block";
+      $("#data-table").DataTable({  
+           "ajax"     : {"url": "/api_call/vendor", dataSrc:"QueryResponse.Vendor"},  
+           "columns"     :     [  
+                {     "data"     :     "DisplayName"     }
+           ]  
+      });  
     }
     function revokeCall() {
       $("#result").html('Loading...')
@@ -57,9 +46,7 @@
   <p>Would you like to make a sample API call?</p>
   <div>
     <button onclick="apiCall()">QuickBooks API Call</button>
-    <!--button onclick="viewVendors()">View Vendors</button-->
-    <button onclick="updateVendors()">Push Vendors</button>
-    <button onclick="updateAccounts()">Push Accounts</button>
+    <button onclick="viewVendors()">View Vendors</button>
     <button onclick="refreshCall()">Refresh Token Call</button>
     <button onclick="revokeCall()">Revoke Token Call</button>
     <div class="container">
