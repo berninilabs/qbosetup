@@ -43,12 +43,12 @@ $('#userTable').on('click','.updateUser',function(){
 
    // AJAX request
    $.ajax({
-      url: 'user_api_call/user',
+      url: `user_api_call/user/${id}`,
       type: 'put',
-      data: {id: id, name: name, email: email},
+      data: {name: name, email: email},
       dataType: 'json',
       success: function(response){
-         if(response.status == 200){
+         if(response == "OK"){ //FIXME
 
            $('#name').val(response.data.name);
            $('#email').val(response.data.email);
@@ -73,12 +73,12 @@ $('#btn_save').click(function(){
 
      // AJAX request
      $.ajax({
-       url: 'user_api_call/user',
+       url: `user_api_call/user/${id}`,
        type: 'put',
-       data: {id: id, name: name, email: email},
+       data: {name: name, email: email},
        dataType: 'json',
        success: function(response){
-          if(response.status == 200){
+          if(response == "OK"){
              alert(response.message);
 
              // Empty and reset the values
@@ -112,13 +112,11 @@ $('#userTable').on('click','.deleteUser',function(){
         url: `user_api_call/user/${id}`,
         type: 'delete',
         success: function(response){
-           if(response.status == 200){
-              alert("Record deleted.");
-
+           if(response == "OK"){//FIXME
               // Reload DataTable
               userDataTable.ajax.reload();
            }else{
-              alert("Invalid ID.");
+              console.log(response)
            }
         }
       });
@@ -190,7 +188,11 @@ $('#userTable').on('click','.deleteUser',function(){
           <div class="form-group">
             <label for="name" >Name</label>
             <input type="text" class="form-control" id="name" placeholder="Enter name" required> 
-          </div> 
+          </div>
+          <div class="form-group">
+            <label for="email" >Email</label>
+            <input type="text" class="form-control" id="email" placeholder="Enter email" required> 
+          </div>
         </div>
         <div class="modal-footer">
           <input type="hidden" id="txt_userid" value="0">

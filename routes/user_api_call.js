@@ -21,9 +21,9 @@ var users_in_db = [
 router.get("/users", function (req, res) {
   console.log(`Inside list users`);
   for (i in users_in_db) {
-    const updateButton = `"<button class='btn btn-sm btn-info updateUser' data-id='${users_in_db[i].id}' data-toggle='modal' data-target='#updateModal' >Update</button>";`;
+    const updateButton = `<button class='btn btn-sm btn-info updateUser' data-id='${users_in_db[i].id}' data-toggle='modal' data-target='#updateModal' >Update</button>`;
     // Delete Button
-    const deleteButton = `"<button class='btn btn-sm btn-danger deleteUser' data-id='${users_in_db[i].id}'>Delete</button>"`;
+    const deleteButton = `<button class='btn btn-sm btn-danger deleteUser' data-id='${users_in_db[i].id}'>Delete</button>`;
     users_in_db[i].action = `${updateButton} ${deleteButton}`;
   }
   return res.json(users_in_db);
