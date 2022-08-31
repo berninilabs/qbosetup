@@ -32,7 +32,9 @@ router.get("/users", function (req, res) {
 router.put("/user/:id", function (req, res) {
   const { id } = req.params;
   console.log(
-    `Inside put user with id ${id} with update as ${JSON.stringify(req.body)}`
+    `Inside put user with id ${id}, req params: ${JSON.stringify(
+      req.params
+    )}, with update as ${JSON.stringify(req.body)}`
   );
   users_in_db = users_in_db.filter((e) => e.id != id);
   var updatedItem = req.body;

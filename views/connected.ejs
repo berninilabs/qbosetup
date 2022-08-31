@@ -35,33 +35,6 @@ var userDataTable = $('#userTable').DataTable({
    ]
 });
 
-// Update record
-$('#userTable').on('click','.updateUser',function(){
-   var id = $(this).data('id');
-
-   $('#txt_userid').val(id);
-
-   // AJAX request
-   $.ajax({
-      url: `user_api_call/user/${id}`,
-      type: 'put',
-      data: {name: name, email: email},
-      dataType: 'json',
-      success: function(response){
-         if(response == "OK"){ //FIXME
-
-           $('#name').val(response.data.name);
-           $('#email').val(response.data.email);
-
-           userDataTable.ajax.reload();
-         }else{
-           alert("Invalid ID.");
-         }
-      }
-   });
-
-});
-
 // Save user 
 $('#btn_save').click(function(){
    var id = $('#txt_userid').val();
@@ -69,13 +42,15 @@ $('#btn_save').click(function(){
    var name = $('#name').val().trim();
    var email = $('#email').val().trim();
 
-   if(name !='' && email != ''){
+   console.log(`About to Post or Put. id is ${id}, Name is ${name} and Email is ${email}`);
+   if (id === undefined || id == -1) {
 
-     // AJAX request
-     $.ajax({
-       url: `user_api_call/user/${id}`,
-       type: 'put',
-       data: {name: name, email: email},
+    // AJAX request
+    $.ajax({
+       url: `user_api_call/user`,
+       type: 'post',
+       data: JSON.stringify({name: name, email: email}),
+       contentType: "application/json",
        dataType: 'json',
        success: function(response){
           if(response == "OK"){
@@ -83,7 +58,34 @@ $('#btn_save').click(function(){
 
              // Empty and reset the values
              $('#name','#email').val('');
-             $('#txt_userid').val(0);
+
+             // Reload DataTable
+             userDataTable.ajax.reload();
+
+             // Close modal
+             $('#updateModal').modal('toggle');
+          }else{
+             alert(response.message);
+          }
+       }
+      });
+
+   } else if(name !='' && email != ''){
+
+     // AJAX request
+     $.ajax({
+       url: `user_api_call/user/${id}`,
+       type: 'put',
+       contentType: "application/json",
+       data: JSON.stringify({name: name, email: email}),
+       dataType: 'json',
+       success: function(response){
+          if(response == "OK"){
+             alert(response.message);
+
+             // Empty and reset the values
+             $('#name','#email').val('');
+             $('#txt_userid').val(-1);
 
              // Reload DataTable
              userDataTable.ajax.reload();
@@ -131,15 +133,6 @@ $('#userTable').on('click','.deleteUser',function(){
         $("#result").html(JSON.stringify(data, null, 2))
       })
     }
-    function viewVendors() {
-      //$("#data-table").style.display = "block";
-      $("#data-table").DataTable({  
-           "ajax"     : {"url": "/api_call/vendor", dataSrc:"QueryResponse.Vendor"},  
-           "columns"     :     [  
-                {     "data"     :     "DisplayName"     }
-           ]  
-      });  
-    }
     function revokeCall() {
       $("#result").html('Loading...')
       $.get("/api_call/revoke", function(data) {
@@ -173,7 +166,8 @@ $('#userTable').on('click','.deleteUser',function(){
           </div>
           <button class="submit-btn" type='submit'>Upload</button>
       </form>
-  </div>
+    </div>
+    <button class='btn btn-sm createUser' data-toggle='modal' data-target='#updateModal'>Create user</button>
   <!-- Modal -->
   <div id="updateModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -195,7 +189,7 @@ $('#userTable').on('click','.deleteUser',function(){
           </div>
         </div>
         <div class="modal-footer">
-          <input type="hidden" id="txt_userid" value="0">
+          <input type="hidden" id="txt_userid" value="-1">
           <button type="button" class="btn btn-success btn-sm" id="btn_save">Save</button>
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
         </div>
