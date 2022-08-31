@@ -43,7 +43,7 @@ $('#btn_save').click(function(){
    var email = $('#email').val().trim();
 
    console.log(`About to Post or Put. id is ${id}, Name is ${name} and Email is ${email}`);
-   if (id === undefined || id == -1) {
+   if (id == -1) {
 
     // AJAX request
     $.ajax({
@@ -101,6 +101,14 @@ $('#btn_save').click(function(){
   }else{
      alert('Please fill all fields.');
   }
+});
+
+
+$('#userTable').on('click','.updateUser',function(){
+     //var updateConfirm = confirm("Are you sure?");
+     var id = $(this).data('id');
+     console.log(`Value of id is ${id}`);
+     $('#txt_userid').val(id);
 });
 
 // Delete record

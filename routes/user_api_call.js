@@ -26,6 +26,7 @@ router.get("/users", function (req, res) {
     const deleteButton = `<button class='btn btn-sm btn-danger deleteUser' data-id='${users_in_db[i].id}'>Delete</button>`;
     users_in_db[i].action = `${updateButton} ${deleteButton}`;
   }
+  console.log(`Returning ${JSON.stringify(users_in_db)}`);
   return res.json(users_in_db);
 });
 
