@@ -2,9 +2,10 @@ var path = require("path");
 var config = require("./config.json");
 var express = require("express");
 var session = require("express-session");
+const bodyParser = require("body-parser");
 
 var app = express();
-
+app.use(express.json());
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));

@@ -26,7 +26,7 @@ var userDataTable = $('#userTable').DataTable({
    'serverSide': true,
    'serverMethod': 'get',
    'ajax': {
-      'url':'user_api_call/users'
+      'url':'user_api_call/users', 'dataSrc': ''
    },
    'columns': [
       { data: 'name' },
@@ -43,12 +43,12 @@ $('#userTable').on('click','.updateUser',function(){
 
    // AJAX request
    $.ajax({
-      url: 'user_api_call/users',
-      type: 'post',
-      data: {request: 2, id: id},
+      url: 'user_api_call/user',
+      type: 'put',
+      data: {id: id, name: name, email: email},
       dataType: 'json',
       success: function(response){
-         if(response.status == 1){
+         if(response.status == 200){
 
            $('#name').val(response.data.name);
            $('#email').val(response.data.email);
@@ -73,12 +73,12 @@ $('#btn_save').click(function(){
 
      // AJAX request
      $.ajax({
-       url: 'user_api_call/users',
-       type: 'post',
-       data: {request: 3, id: id,name: name, email: email},
+       url: 'user_api_call/user',
+       type: 'put',
+       data: {id: id, name: name, email: email},
        dataType: 'json',
        success: function(response){
-          if(response.status == 1){
+          if(response.status == 200){
              alert(response.message);
 
              // Empty and reset the values
@@ -109,11 +109,10 @@ $('#userTable').on('click','.deleteUser',function(){
    if (deleteConfirm == true) {
       // AJAX request
       $.ajax({
-        url: 'user_api_call/users',
-        type: 'post',
-        data: {request: 4, id: id},
+        url: `user_api_call/user/${id}`,
+        type: 'delete',
         success: function(response){
-           if(response == 1){
+           if(response.status == 200){
               alert("Record deleted.");
 
               // Reload DataTable
@@ -202,13 +201,13 @@ $('#userTable').on('click','.deleteUser',function(){
 
     </div>
   </div>
-  <table id="data-table" class="table table-bordered">  
+  <!--table id="data-table" class="table table-bordered">  
     <thead>  
          <tr>  
               <th>Display Name</th> 
          </tr>  
     </thead>  
-  </table>
+  </table-->
   <!-- Table -->
   <table id='userTable' class='display dataTable' width='100%'>
     <thead>
